@@ -1,0 +1,39 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Description: Simple EC2 instance launched via CloudFormation Console
+
+Parameters:
+  KeyName:
+    Description: EC2 KeyPair to SSH into the instance
+    Type: AWS::EC2::KeyPair::KeyName
+
+Resources:
+  EC2SecurityGroup:
+    Type: AWS::EC2::SecurityGroup
+    Properties:
+      GroupDescription: Allow SSH
+      SecurityGroupIngress:
+        - IpProtocol: tcp
+          FromPort: 22
+          ToPort: 22
+          CidrIp: 0.0.0.0/0
+
+  EC2Instance:
+    Type: AWS::EC2::Instance
+    Properties:
+      InstanceType: t2.micro
+      KeyName: !Ref KeyName
+      ImageId: ami-06b6e5225d1db5f46  # Amazon Linux 2 (adjust based on your region)
+      SecurityGroupIds:
+        - !Ref EC2SecurityGroup
+      Tags:
+        - Key: Name
+          Value: CFN-Console-EC2
+
+Outputs:
+  InstanceId:
+    Description: EC2 Instance ID
+    Value: !Ref EC2Instance
+
+  PublicIP:
+    Description: Public IP Address
+    Value: !GetAtt EC2Instance.PublicIp
